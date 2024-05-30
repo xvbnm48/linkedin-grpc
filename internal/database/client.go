@@ -14,6 +14,7 @@ import (
 type DatabaseClient interface {
 	Ready() bool
 	GetAllCustomers(ctx context.Context, emailAddress string) ([]models.Customer, error)
+	GetAllProducts(ctx context.Context, vendorId string) ([]models.Product, error)
 }
 
 type Client struct {
