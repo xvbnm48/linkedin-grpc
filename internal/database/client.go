@@ -1,7 +1,9 @@
 package database
 
 import (
+	"context"
 	"fmt"
+	"github.com/xvbnm48/linkedin-grpc/internal/models"
 	"time"
 
 	"gorm.io/driver/postgres"
@@ -11,6 +13,7 @@ import (
 
 type DatabaseClient interface {
 	Ready() bool
+	GetAllCustomers(ctx context.Context, emailAddress string) ([]models.Customer, error)
 }
 
 type Client struct {
