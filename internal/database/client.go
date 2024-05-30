@@ -9,21 +9,31 @@ import (
 	"gorm.io/gorm/schema"
 )
 
-type DatabaseClient interface{}
+type DatabaseClient interface {
+	Ready() bool
+}
 
 type Client struct {
 	DB *gorm.DB
 }
 
 func NewDatabaseClient() (DatabaseClient, error) {
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Shanghai", "localhost", "postgres", "fariz", "postgres", "5432")
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=%s",
+		"localhost",
+		"postgres",
+		"fariz",
+		"linkedid-grpc",
+		5432,
+		"disable",
+	)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		NamingStrategy: schema.NamingStrategy{
-			TablePrefix: "wisdom_", // table name prefix
+			TablePrefix: "wisdom.", // table name prefix
 		},
 		NowFunc: func() time.Time {
 			return time.Now().UTC()
 		},
+		QueryFields: true,
 	})
 	if err != nil {
 		return nil, err
@@ -35,8 +45,8 @@ func NewDatabaseClient() (DatabaseClient, error) {
 
 func (c Client) Ready() bool {
 	var ready string
-	tx := c.DB.Raw("SELECT 'ready'").Scan(&ready)
-	if tx != nil {
+	tx := c.DB.Raw("SELECT 1 as ready").Scan(&ready)
+	if tx.Error != nil {
 		return false
 	}
 	if ready == "1" {
