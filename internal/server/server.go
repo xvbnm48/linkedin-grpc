@@ -15,6 +15,7 @@ type Server interface {
 	Start() error
 	Readiness(ctx echo.Context) error
 	Liveness(ctx echo.Context) error
+
 	GetAllCustomer(ctx echo.Context) error
 	AddNewCustomer(ctx echo.Context) error
 
@@ -22,6 +23,7 @@ type Server interface {
 	AddNewProduct(ctx echo.Context) error
 
 	GetAllService(ctx echo.Context) error
+	AddNewService(ctx echo.Context) error
 
 	GetAllVendor(ctx echo.Context) error
 	AddNewVendor(ctx echo.Context) error
@@ -64,6 +66,7 @@ func (s *EchoServer) registerRoutes() {
 
 	sg := s.echo.Group("/services")
 	sg.GET("", s.GetAllService)
+	sg.POST("", s.AddNewService)
 
 	vg := s.echo.Group("/vendors")
 	vg.GET("", s.GetAllVendor)
