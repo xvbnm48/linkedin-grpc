@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"github.com/xvbnm48/linkedin-grpc/internal/models"
 	"log"
 	"net/http"
@@ -15,6 +16,7 @@ type Server interface {
 	Readiness(ctx echo.Context) error
 	Liveness(ctx echo.Context) error
 	GetAllCustomer(ctx echo.Context) error
+	AddNewCustomer(ctx echo.Context) error
 	GetAllProducts(ctx echo.Context) error
 	GetAllService(ctx echo.Context) error
 	GetAllVendor(ctx echo.Context) error
@@ -37,6 +39,8 @@ func NewEchoServer(db database.DatabaseClient) Server {
 }
 
 func (s *EchoServer) Start() error {
+	s.echo.Use(middleware.Logger())
+	s.echo.Use(middleware.Recover())
 	if err := s.echo.Start(":8080"); err != nil && err != http.ErrServerClosed {
 		log.Fatalf("server shutdown with error: %v", err)
 	}
@@ -47,6 +51,7 @@ func (s *EchoServer) registerRoutes() {
 	s.echo.GET("/liveness", s.Liveness)
 	cg := s.echo.Group("/customers")
 	cg.GET("", s.GetAllCustomer)
+	cg.POST("", s.AddNewCustomer)
 
 	pg := s.echo.Group("/products")
 	pg.GET("", s.GetAllProducts)
