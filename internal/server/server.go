@@ -17,9 +17,14 @@ type Server interface {
 	Liveness(ctx echo.Context) error
 	GetAllCustomer(ctx echo.Context) error
 	AddNewCustomer(ctx echo.Context) error
+
 	GetAllProducts(ctx echo.Context) error
+	AddNewProduct(ctx echo.Context) error
+
 	GetAllService(ctx echo.Context) error
+
 	GetAllVendor(ctx echo.Context) error
+	AddNewVendor(ctx echo.Context) error
 }
 
 type EchoServer struct {
@@ -55,12 +60,14 @@ func (s *EchoServer) registerRoutes() {
 
 	pg := s.echo.Group("/products")
 	pg.GET("", s.GetAllProducts)
+	pg.POST("", s.AddNewProduct)
 
 	sg := s.echo.Group("/services")
 	sg.GET("", s.GetAllService)
 
 	vg := s.echo.Group("/vendors")
 	vg.GET("", s.GetAllVendor)
+	vg.POST("", s.AddNewVendor)
 }
 func (s *EchoServer) Readiness(ctx echo.Context) error {
 	ready := s.Db.Ready()
