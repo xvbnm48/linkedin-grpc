@@ -26,3 +26,18 @@ func (c Client) AddService(ctx context.Context, service *models.Service) (*model
 	}
 	return service, nil
 }
+
+func (c Client) GetServiceByID(ctx context.Context, ID string) (*models.Service, error) {
+	service := &models.Service{}
+	result := c.DB.WithContext(ctx).Raw("SELECT * FROM wisdom.services WHERE service_id = ?", ID).Scan(service)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return nil, &dberrors.NotFoundError{Entity: "service", ID: ID}
+		}
+		return nil, result.Error
+	}
+	if result.RowsAffected == 0 {
+		return nil, &dberrors.NotFoundError{Entity: "service", ID: ID}
+	}
+	return service, nil
+}
