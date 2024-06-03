@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/xvbnm48/linkedin-grpc/internal/dberrors"
 	"github.com/xvbnm48/linkedin-grpc/internal/models"
@@ -37,6 +38,7 @@ func (s *EchoServer) AddNewCustomer(ctx echo.Context) error {
 func (s *EchoServer) GetCustomerById(ctx echo.Context) error {
 	ID := ctx.Param("id")
 	customer, err := s.Db.GetCustomerById(ctx.Request().Context(), ID)
+	fmt.Println("err", err)
 	if err != nil {
 		switch err.(type) {
 		case *dberrors.NotFoundError:
