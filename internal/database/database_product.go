@@ -30,3 +30,19 @@ func (c Client) AddProduct(ctx context.Context, product *models.Product) (*model
 
 	return product, nil
 }
+
+func (c Client) GetProductById(ctx context.Context, ID string) (*models.Product, error) {
+	product := &models.Product{}
+	result := c.DB.WithContext(ctx).Raw("SELECT * FROM wisdom.products WHERE product_id = ?", ID).Scan(product)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return nil, &dberrors.NotFoundError{Entity: "product", ID: ID}
+		}
+		return nil, result.Error
+	}
+	if result.RowsAffected == 0 {
+		return nil, &dberrors.NotFoundError{Entity: "product", ID: ID}
+	}
+
+	return product, nil
+}

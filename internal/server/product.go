@@ -36,3 +36,18 @@ func (s *EchoServer) AddNewProduct(ctx echo.Context) error {
 	}
 	return ctx.JSON(http.StatusCreated, newProduct)
 }
+
+func (s *EchoServer) GetProductById(ctx echo.Context) error {
+	ID := ctx.Param("id")
+	product, err := s.Db.GetProductById(ctx.Request().Context(), ID)
+	fmt.Println("err", err)
+	if err != nil {
+		switch err.(type) {
+		case *dberrors.NotFoundError:
+			return ctx.JSON(http.StatusNotFound, err.Error())
+		default:
+			return ctx.JSON(http.StatusInternalServerError, err.Error())
+		}
+	}
+	return ctx.JSON(http.StatusOK, product)
+}
