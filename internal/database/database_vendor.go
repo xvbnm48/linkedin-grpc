@@ -27,3 +27,19 @@ func (c Client) AddVendor(ctx context.Context, vendor *models.Vendor) (*models.V
 	}
 	return vendor, nil
 }
+
+func (c Client) GetVendorByID(ctx context.Context, id string) (*models.Vendor, error) {
+	vendor := &models.Vendor{}
+	result := c.DB.WithContext(ctx).Raw("SELECT * FROM wisdom.vendors WHERE vendor_id = ?", id).Scan(vendor)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return nil, &dberrors.NotFoundError{Entity: "vendor", ID: id}
+		}
+		return nil, result.Error
+	}
+	if result.RowsAffected == 0 {
+		return nil, &dberrors.NotFoundError{Entity: "vendor", ID: id}
+	}
+
+	return vendor, nil
+}
