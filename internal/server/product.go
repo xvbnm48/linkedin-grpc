@@ -44,9 +44,9 @@ func (s *EchoServer) GetProductById(ctx echo.Context) error {
 	if err != nil {
 		switch err.(type) {
 		case *dberrors.NotFoundError:
-			return ctx.JSON(http.StatusNotFound, err.Error())
+			return ctx.JSON(http.StatusNotFound, err)
 		default:
-			return ctx.JSON(http.StatusInternalServerError, err.Error())
+			return ctx.JSON(http.StatusInternalServerError, err)
 		}
 	}
 	return ctx.JSON(http.StatusOK, product)
