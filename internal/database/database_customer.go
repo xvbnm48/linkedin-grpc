@@ -3,7 +3,6 @@ package database
 import (
 	"context"
 	"errors"
-	"fmt"
 	"github.com/google/uuid"
 	"github.com/xvbnm48/linkedin-grpc/internal/dberrors"
 	"github.com/xvbnm48/linkedin-grpc/internal/models"
@@ -28,19 +27,35 @@ func (c Client) AddCustomer(ctx context.Context, customer *models.Customer) (*mo
 	return customer, nil
 }
 
+//func (c Client) GetCustomerById(ctx context.Context, ID string) (*models.Customer, error) {
+//	customer := &models.Customer{}
+//	//result := c.DB.WithContext(ctx).Where("customer_id = ?", ID).First(customer)
+//	//result := c.DB.WithContext(ctx).Raw("SELECT * FROM wisdom.customers WHERE customer_id = ?", ID).Scan(customer)
+//	result := c.DB.WithContext(ctx).Where(&models.Service{ServiceID: ID}).First(&customer)
+//	fmt.Println("result", result)
+//	if result.Error != nil {
+//		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+//			return nil, &dberrors.NotFoundError{Entity: "customer", ID: ID}
+//		}
+//		return nil, result.Error
+//	}
+//	//if result.RowsAffected == 0 {
+//	//	return nil, &dberrors.NotFoundError{Entity: "customer", ID: ID}
+//	//}
+//	return customer, nil
+//}
+
 func (c Client) GetCustomerById(ctx context.Context, ID string) (*models.Customer, error) {
 	customer := &models.Customer{}
-	//result := c.DB.WithContext(ctx).Where("customer_id = ?", ID).First(customer)
-	result := c.DB.WithContext(ctx).Raw("SELECT * FROM wisdom.customers WHERE customer_id = ?", ID).Scan(customer)
-	fmt.Println("result", result)
+	result := c.DB.WithContext(ctx).Where(&models.Customer{CustomerID: ID}).First(&customer)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			return nil, &dberrors.NotFoundError{Entity: "customer", ID: ID}
+			return nil, &dberrors.NotFoundError{
+				Entity: "customer",
+				ID:     ID,
+			}
 		}
 		return nil, result.Error
-	}
-	if result.RowsAffected == 0 {
-		return nil, &dberrors.NotFoundError{Entity: "customer", ID: ID}
 	}
 	return customer, nil
 }

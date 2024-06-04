@@ -52,7 +52,7 @@ func NewEchoServer(db database.DatabaseClient) Server {
 func (s *EchoServer) Start() error {
 	s.echo.Use(middleware.Logger())
 	s.echo.Use(middleware.Recover())
-	if err := s.echo.Start(":8080"); err != nil && err != http.ErrServerClosed {
+	if err := s.echo.Start(":8081"); err != nil && err != http.ErrServerClosed {
 		log.Fatalf("server shutdown with error: %v", err)
 	}
 	return nil
