@@ -51,3 +51,29 @@ func (s *EchoServer) GetProductById(ctx echo.Context) error {
 	}
 	return ctx.JSON(http.StatusOK, product)
 }
+
+func (s *EchoServer) UpdateProduct(ctx echo.Context) error {
+	ID := ctx.Param("id")
+	product := new(models.Product)
+	fmt.Println("this is a body", product)
+	if err := ctx.Bind(product); err != nil {
+		return ctx.JSON(http.StatusUnsupportedMediaType, err)
+	}
+	if ID != product.ProductID {
+		return ctx.JSON(http.StatusBadRequest, "ID in URL and ID in body are not the same")
+	}
+
+	product, err := s.Db.UpdateProduct(ctx.Request().Context(), product)
+	if err != nil {
+		switch err.(type) {
+		case *dberrors.NotFoundError:
+			return ctx.JSON(http.StatusNotFound, err)
+		case *dberrors.ConflictError:
+			return ctx.JSON(http.StatusConflict, err)
+		default:
+			return ctx.JSON(http.StatusInternalServerError, err)
+		}
+	}
+
+	return ctx.JSON(http.StatusOK, product)
+}

@@ -49,3 +49,28 @@ func (s *EchoServer) GetCustomerById(ctx echo.Context) error {
 	}
 	return ctx.JSON(http.StatusOK, customer)
 }
+
+func (s *EchoServer) UpdateCustomer(ctx echo.Context) error {
+	ID := ctx.Param("id")
+	customer := new(models.Customer)
+	if err := ctx.Bind(customer); err != nil {
+		return ctx.JSON(http.StatusUnsupportedMediaType, err)
+	}
+	fmt.Println("this is a body", customer)
+	if ID != customer.CustomerID {
+		return ctx.JSON(http.StatusBadRequest, "ID in the URL does not match the ID in the body")
+	}
+	customer, err := s.Db.UpdateCustomer(ctx.Request().Context(), customer)
+	if err != nil {
+		switch err.(type) {
+		case *dberrors.NotFoundError:
+			return ctx.JSON(http.StatusNotFound, err)
+		case *dberrors.ConflictError:
+			return ctx.JSON(http.StatusConflict, err)
+		default:
+			return ctx.JSON(http.StatusInternalServerError, err)
+		}
+	}
+
+	return ctx.JSON(http.StatusOK, customer)
+}

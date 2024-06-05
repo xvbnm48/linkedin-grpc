@@ -17,10 +17,12 @@ type DatabaseClient interface {
 	GetAllCustomers(ctx context.Context, emailAddress string) ([]models.Customer, error)
 	AddCustomer(ctx context.Context, customer *models.Customer) (*models.Customer, error)
 	GetCustomerById(ctx context.Context, ID string) (*models.Customer, error)
+	UpdateCustomer(ctx context.Context, customer *models.Customer) (*models.Customer, error)
 
 	GetAllProducts(ctx context.Context, vendorId string) ([]models.Product, error)
 	AddProduct(ctx context.Context, product *models.Product) (*models.Product, error)
 	GetProductById(ctx context.Context, ID string) (*models.Product, error)
+	UpdateProduct(ctx context.Context, product *models.Product) (*models.Product, error)
 
 	GetAllService(ctx context.Context) ([]models.Service, error)
 	AddService(ctx context.Context, service *models.Service) (*models.Service, error)

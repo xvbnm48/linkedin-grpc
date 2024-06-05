@@ -8,6 +8,7 @@ import (
 	"github.com/xvbnm48/linkedin-grpc/internal/dberrors"
 	"github.com/xvbnm48/linkedin-grpc/internal/models"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 func (c Client) GetAllProducts(ctx context.Context, vendorId string) ([]models.Product, error) {
@@ -45,4 +46,30 @@ func (c Client) GetProductById(ctx context.Context, ID string) (*models.Product,
 	}
 
 	return product, nil
+}
+
+func (c Client) UpdateProduct(ctx context.Context, product *models.Product) (*models.Product, error) {
+	var products []models.Product
+	result := c.DB.WithContext(ctx).
+		Model(&products).
+		Clauses(clause.Returning{}).
+		Where(&models.Product{ProductID: product.ProductID}).
+		Updates(models.Product{
+			ProductID: product.ProductID,
+			Name:      product.Name,
+			Price:     product.Price,
+			VendorID:  product.VendorID,
+		})
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return nil, &dberrors.NotFoundError{Entity: "product", ID: product.ProductID}
+		}
+		return nil, result.Error
+	}
+
+	if result.RowsAffected == 0 {
+		return nil, &dberrors.NotFoundError{Entity: "product", ID: product.ProductID}
+	}
+
+	return &products[0], nil
 }
