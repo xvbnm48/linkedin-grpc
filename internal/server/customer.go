@@ -81,5 +81,5 @@ func (s *EchoServer) DeleteCustomer(ctx echo.Context) error {
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, err)
 	}
-	return ctx.NoContent(http.StatusNoContent)
+	return ctx.JSON(http.StatusOK, "Customer deleted")
 }

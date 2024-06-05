@@ -73,3 +73,7 @@ func (c Client) UpdateProduct(ctx context.Context, product *models.Product) (*mo
 
 	return &products[0], nil
 }
+
+func (c Client) DeleteProduct(ctx context.Context, id string) error {
+	return c.DB.WithContext(ctx).Delete(&models.Product{ProductID: id}).Error
+}
