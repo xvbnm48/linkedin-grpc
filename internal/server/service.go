@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/xvbnm48/linkedin-grpc/internal/dberrors"
 	"github.com/xvbnm48/linkedin-grpc/internal/models"
@@ -45,6 +46,30 @@ func (s *EchoServer) GetServiceById(ctx echo.Context) error {
 			return ctx.JSON(http.StatusInternalServerError, err)
 		}
 
+	}
+
+	return ctx.JSON(http.StatusOK, service)
+}
+
+func (s *EchoServer) UpdateService(ctx echo.Context) error {
+	ID := ctx.Param("id")
+	service := new(models.Service)
+	if err := ctx.Bind(service); err != nil {
+		return ctx.JSON(http.StatusUnsupportedMediaType, err)
+	}
+	fmt.Println("this is a body", service)
+
+	if ID != service.ServiceID {
+		return ctx.JSON(http.StatusBadRequest, "ID in the path does not match the ID in the body")
+	}
+	service, err := s.Db.UpdateService(ctx.Request().Context(), service)
+	if err != nil {
+		switch err.(type) {
+		case *dberrors.NotFoundError:
+			return ctx.JSON(http.StatusNotFound, err)
+		default:
+			return ctx.JSON(http.StatusInternalServerError, err)
+		}
 	}
 
 	return ctx.JSON(http.StatusOK, service)

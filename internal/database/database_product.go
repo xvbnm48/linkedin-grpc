@@ -62,7 +62,7 @@ func (c Client) UpdateProduct(ctx context.Context, product *models.Product) (*mo
 		})
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			return nil, &dberrors.NotFoundError{Entity: "product", ID: product.ProductID}
+			return nil, &dberrors.ConflictError{}
 		}
 		return nil, result.Error
 	}

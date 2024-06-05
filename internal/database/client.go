@@ -27,6 +27,7 @@ type DatabaseClient interface {
 	GetAllService(ctx context.Context) ([]models.Service, error)
 	AddService(ctx context.Context, service *models.Service) (*models.Service, error)
 	GetServiceByID(ctx context.Context, ID string) (*models.Service, error)
+	UpdateService(ctx context.Context, service *models.Service) (*models.Service, error)
 
 	GetAllVendors(ctx context.Context) ([]models.Vendor, error)
 	AddVendor(ctx context.Context, vendor *models.Vendor) (*models.Vendor, error)
