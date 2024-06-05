@@ -67,3 +67,7 @@ func (c Client) UpdateService(ctx context.Context, service *models.Service) (*mo
 	return &services[0], nil
 
 }
+
+func (c Client) DeleteService(ctx context.Context, ID string) error {
+	return c.DB.WithContext(ctx).Delete(&models.Service{ServiceID: ID}).Error
+}

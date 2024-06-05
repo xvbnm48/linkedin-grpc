@@ -74,3 +74,14 @@ func (s *EchoServer) UpdateService(ctx echo.Context) error {
 
 	return ctx.JSON(http.StatusOK, service)
 }
+
+func (s *EchoServer) DeleteService(ctx echo.Context) error {
+	id := ctx.Param("id")
+
+	err := s.Db.DeleteService(ctx.Request().Context(), id)
+	if err != nil {
+		return ctx.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return ctx.JSON(http.StatusOK, "Service deleted successfully")
+}
